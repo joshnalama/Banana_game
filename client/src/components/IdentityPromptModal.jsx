@@ -201,3 +201,4 @@ export default function IdentityPromptModal({ isOpen, onClose, onAuthenticated }
     </div>
   );
 }
+

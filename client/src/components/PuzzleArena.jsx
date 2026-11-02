@@ -66,25 +66,24 @@ export default function PuzzleArena({ modeKey = 'classic', onExit, onScoreUpdate
     if (status !== 'playing') return;
 
     timerRef.current = setInterval(() => {
-      setElapsedSec((prev) => prev + 1);
-
       if (modeKey === 'timeattack') {
         setTimeAttackRemaining((prev) => {
           if (prev <= 1) {
-            clearInterval(timerRef.current);
             setStatus('finished');
             return 0;
           }
           return prev - 1;
         });
       } else if (modeConfig.limit > 0) {
-        // Individual puzzle timer (Speed Rush)
         setElapsedSec((prev) => {
-          if (prev >= modeConfig.limit) {
-            handleTimeoutLoss();
+          const next = prev + 1;
+          if (next >= modeConfig.limit) {
+            setTimeout(handleTimeoutLoss, 0);
           }
-          return prev;
+          return next;
         });
+      } else {
+        setElapsedSec((prev) => prev + 1);
       }
     }, 1000);
 
@@ -403,3 +402,4 @@ export default function PuzzleArena({ modeKey = 'classic', onExit, onScoreUpdate
     </div>
   );
 }
+

@@ -23,7 +23,7 @@ class SoundEngine {
   init() {
     if (this.initialized && this.ctx) {
       if (this.ctx.state === 'suspended') {
-        this.ctx.resume();
+        this.ctx.resume().catch(() => {});
       }
       return;
     }
@@ -59,7 +59,7 @@ class SoundEngine {
     if (!this.ctx) return;
 
     if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().catch(() => {});
     }
 
     switch (soundName) {
@@ -270,3 +270,4 @@ class SoundEngine {
 }
 
 export const soundEngine = new SoundEngine();
+

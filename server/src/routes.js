@@ -12,7 +12,7 @@ import { MODES as SHARED_MODES, SPONGEBOB_AVATARS } from '../../shared/src/const
 const r = Router();
 const AVATARS = SPONGEBOB_AVATARS.map((a) => a.icon).concat(['🍌', '🌴', '🥥']);
 const COOKIE = { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 7 * 24 * 3600 * 1000 };
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, message: { error: 'Too many attempts. Try again later.' } });
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 60, message: { error: 'Too many attempts. Try again later.' } });
 const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
 
 const publicUser = (u) => ({
@@ -90,18 +90,22 @@ r.post('/auth/guest', authLimiter, wrap(async (req, res) => {
   const { guestName, avatar } = req.body || {};
   const chosenAvatar = AVATARS.includes(avatar) ? avatar : '🧽';
   const idInfo = generateGuestIdentifier();
-  const username = guestName && /^[A-Za-z0-9_]{3,16}$/.test(guestName) ? `${guestName}_${Math.floor(100 + Math.random() * 900)}` : idInfo.username;
+  const username = guestName && /^[A-Za-z0-9_]{3,16}$/.test(guestName)
+    ? `${guestName}_${Math.floor(100 + Math.random() * 900)}`
+    : idInfo.username;
+  const guestEmail = `${username.toLowerCase()}_${Date.now()}@guest.local`;
 
   try {
-    const { lastInsertRowid: id } = db.prepare('INSERT INTO users (username,avatar,role,is_guest) VALUES (?,?,?,?)')
-      .run(username, chosenAvatar, 'player', 1);
+    const { lastInsertRowid: id } = db.prepare('INSERT INTO users (username,email,avatar,role,is_guest) VALUES (?,?,?,?,?)')
+      .run(username, guestEmail, chosenAvatar, 'player', 1);
     issue(res, Number(id));
     res.json({ user: { id: Number(id), username, avatar: chosenAvatar, score: 0, role: 'player', isGuest: true } });
   } catch (e) {
-    // If collision, generate with random digits
+    // If collision, generate fallback identifier
     const fallbackName = `Guest_${Math.floor(1000 + Math.random() * 9000)}`;
-    const { lastInsertRowid: id } = db.prepare('INSERT INTO users (username,avatar,role,is_guest) VALUES (?,?,?,?)')
-      .run(fallbackName, chosenAvatar, 'player', 1);
+    const fallbackEmail = `${fallbackName.toLowerCase()}_${Date.now()}@guest.local`;
+    const { lastInsertRowid: id } = db.prepare('INSERT INTO users (username,email,avatar,role,is_guest) VALUES (?,?,?,?,?)')
+      .run(fallbackName, fallbackEmail, chosenAvatar, 'player', 1);
     issue(res, Number(id));
     res.json({ user: { id: Number(id), username: fallbackName, avatar: chosenAvatar, score: 0, role: 'player', isGuest: true } });
   }
@@ -216,8 +220,7 @@ r.post('/game/round', requireAuth, wrap(async (req, res) => {
       throw new Error('Malformed Banana API response');
     }
   } catch (err) {
-    // Self-healing Procedural SVG Fallback generator kicks in!
-    console.log(`[Banana API Warning] Using fault-tolerant procedural fallback: ${err.message}`);
+    // Self-healing Procedural SVG Fallback generator kicks in
     const fallback = generateProceduralPuzzle();
     solution = fallback.solution;
     image = fallback.image;
@@ -328,6 +331,7 @@ r.post('/game/answer', requireAuth, (req, res) => {
 /* ---------- 1v1 Multiplayer Duel Engine (SSE) ---------- */
 r.post('/rooms/create', requireAuth, (req, res) => {
   const hostUser = db.prepare('SELECT id,username,avatar FROM users WHERE id=?').get(req.userId);
+  if (!hostUser) return res.status(401).json({ error: 'Session expired.' });
   const duration = Number(req.body?.duration) || 180;
   const room = sseManager.createRoom({ hostUser, duration });
   res.json({ room: sseManager.getPublicRoom(room) });
@@ -335,6 +339,7 @@ r.post('/rooms/create', requireAuth, (req, res) => {
 
 r.post('/rooms/:code/join', requireAuth, (req, res) => {
   const guestUser = db.prepare('SELECT id,username,avatar FROM users WHERE id=?').get(req.userId);
+  if (!guestUser) return res.status(401).json({ error: 'Session expired.' });
   try {
     const room = sseManager.joinRoom(req.params.code, guestUser);
     res.json({ room: sseManager.getPublicRoom(room) });
@@ -398,6 +403,7 @@ r.get('/leaderboard', requireAuth, (req, res) => {
 
 r.get('/profile', requireAuth, (req, res) => {
   const u = db.prepare('SELECT username,email,avatar,score,rounds_won,rounds_lost,streak,best_streak,role,is_guest,created_at FROM users WHERE id=?').get(req.userId);
+  if (!u) return res.status(401).json({ error: 'Session expired.' });
   const rank = db.prepare('SELECT COUNT(*)+1 AS "rank" FROM users WHERE score>?').get(u.score).rank;
   const total = u.rounds_won + u.rounds_lost;
   res.json({

@@ -89,15 +89,15 @@ export default function MinionCenterpiece({ streak = 0, onPoke }) {
           <defs>
             {/* Sponge Sponge Gradient */}
             <radialGradient id="spongeYellow" cx="40%" cy="30%" r="70%">
-              <stop offset="0%" stop-color="#fff176" />
-              <stop offset="65%" stop-color="#fee135" />
-              <stop offset="100%" stop-color="#e0b91f" />
+              <stop offset="0%" stopColor="#fff176" />
+              <stop offset="65%" stopColor="#fee135" />
+              <stop offset="100%" stopColor="#e0b91f" />
             </radialGradient>
             {/* Arc Reactor Glow */}
             <radialGradient id="arcReactorGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#38bdf8" />
-              <stop offset="50%" stop-color="#0284c7" />
-              <stop offset="100%" stop-color="#0369a1" />
+              <stop offset="0%" stopColor="#38bdf8" />
+              <stop offset="50%" stopColor="#0284c7" />
+              <stop offset="100%" stopColor="#0369a1" />
             </radialGradient>
             <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur stdDeviation="4" result="blur" />

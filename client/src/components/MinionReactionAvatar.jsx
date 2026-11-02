@@ -47,3 +47,4 @@ export default function MinionReactionAvatar({ streak = 0, isWrong = false, avat
     </div>
   );
 }
+

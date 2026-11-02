@@ -20,3 +20,4 @@ export default function FloatingPoints({ triggerKey, points = 100, combo = 1 }) 
     </AnimatePresence>
   );
 }
+

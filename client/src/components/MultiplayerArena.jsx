@@ -21,8 +21,13 @@ export default function MultiplayerArena({ user, onExit }) {
     if (!room?.code) return;
 
     const sseUrl = `/api/rooms/${room.code}/stream`;
-    const sse = new EventSource(sseUrl);
+    const sse = new EventSource(sseUrl, { withCredentials: true });
     sseRef.current = sse;
+
+    sse.onerror = (e) => {
+      // Reconnection or close notice
+      console.warn('SSE stream notice:', e);
+    };
 
     sse.addEventListener('room_state', (e) => {
       const data = JSON.parse(e.data);
@@ -408,3 +413,4 @@ export default function MultiplayerArena({ user, onExit }) {
     </div>
   );
 }
+

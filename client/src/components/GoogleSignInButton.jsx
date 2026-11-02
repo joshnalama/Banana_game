@@ -68,3 +68,4 @@ export default function GoogleSignInButton({ onCredentialSuccess, onError }) {
     </div>
   );
 }
+

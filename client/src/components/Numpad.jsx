@@ -53,3 +53,4 @@ export default function Numpad({ onDigit, disabled = false, wrongDigits = [] }) 
     </div>
   );
 }
+

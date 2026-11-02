@@ -36,3 +36,4 @@ export function calculatePuzzleScore({ base = 100, hintsUsed = 0, wrongAttempts 
   const comboMultiplier = 1 + Math.min(combo - 1, 5) * 0.2; // up to 2x for 5x streak
   return Math.round(rawBase * modeMult * comboMultiplier);
 }
+
