@@ -38,3 +38,4 @@ All rules and scoring run on the server.
 - bcrypt passwords, JWT in an httpOnly cookie, parameterised SQL, helmet, CORS lock, rate limits.
 - `server/data` and `server/.env` are git-ignored. To reset all data, stop the server and delete `server/data`.
 # Banana_game
+# Banana_game
