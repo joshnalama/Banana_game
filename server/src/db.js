@@ -15,10 +15,12 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL UNIQUE COLLATE NOCASE,
-    email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    email TEXT UNIQUE COLLATE NOCASE,
     password_hash TEXT,
     google_id TEXT UNIQUE,
-    avatar TEXT NOT NULL DEFAULT '🍌',
+    avatar TEXT NOT NULL DEFAULT '🧽',
+    role TEXT NOT NULL DEFAULT 'player' CHECK (role IN ('player', 'admin')),
+    is_guest INTEGER NOT NULL DEFAULT 0,
     score INTEGER NOT NULL DEFAULT 0,
     rounds_won INTEGER NOT NULL DEFAULT 0,
     rounds_lost INTEGER NOT NULL DEFAULT 0,
@@ -33,6 +35,7 @@ db.exec(`
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     image_url TEXT NOT NULL,
     solution INTEGER NOT NULL,
+    hmac_token TEXT,
     hints_used INTEGER NOT NULL DEFAULT 0,
     wrong_attempts INTEGER NOT NULL DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','won','lost')),
@@ -42,3 +45,8 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_rounds_user ON rounds(user_id, status);
   CREATE INDEX IF NOT EXISTS idx_users_score ON users(score DESC);
 `);
+
+// Safe migrations for existing databases
+try { db.exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'player'"); } catch {}
+try { db.exec("ALTER TABLE users ADD COLUMN is_guest INTEGER NOT NULL DEFAULT 0"); } catch {}
+try { db.exec("ALTER TABLE rounds ADD COLUMN hmac_token TEXT"); } catch {}
