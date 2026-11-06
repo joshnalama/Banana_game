@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CIS046-3 Week 8 Submission - Joshna Lama Tamang</title>
+<style>
+  body {
+    font-family: Arial, Calibri, sans-serif;
+    line-height: 1.4;
+    color: #111;
+    max-width: 750px;
+    margin: 20px auto;
+    padding: 0 15px;
+    font-size: 13px;
+  }
+  .header-box {
+    border-bottom: 2px solid #000;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+  .title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #0b2545;
+    margin-top: 12px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 2px;
+  }
+  .question {
+    font-size: 12px;
+    font-style: italic;
+    color: #444;
+    margin-bottom: 4px;
+  }
+  .answer {
+    font-size: 12.5px;
+    margin-bottom: 10px;
+  }
+  ul {
+    margin: 3px 0 6px 18px;
+    padding: 0;
+  }
+  li {
+    margin-bottom: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header-box">
+  <div class="title">CIS046-3 Software for Enterprise – AY 26/27</div>
+  <div class="header-row">
+    <div><strong>Student Name:</strong> Joshna Lama Tamang</div>
+    <div><strong>Student Number:</strong> 2425724</div>
+  </div>
+  <div class="header-row">
+    <div><strong>Student Signature:</strong> ___________________________</div>
+    <div><strong>Date:</strong> November 2026 (Week 8)</div>
+  </div>
+</div>
+
+<div class="section-title">Version Control</div>
+<div class="question">How did you develop your code (e.g., what features have been added after first version)?</div>
+<div class="answer">
+  Developed via <strong>Gitflow</strong> (isolated <code>main</code> and <code>develop</code> branches) and Conventional Commits on GitHub. 
+  <br>
+  <strong>Added after first version:</strong>
+  <ul>
+    <li>Restructured into an npm monorepo (<code>client/</code>, <code>server/</code>, <code>shared/</code>).</li>
+    <li>1v1 real-time split-screen multiplayer duel arena powered by Server-Sent Events (SSE).</li>
+    <li>5 arcade modes (Speed Rush, Survival, Perfect 10, Time Attack, Practice).</li>
+    <li>Offline procedural SVG fallback generator for API outage tolerance.</li>
+    <li>Interactive SpongeBob cursor gaze-tracking hero and synthesized Web Audio sound engine.</li>
+    <li>Instant Guest authentication and server-side HMAC-SHA256 solution verification.</li>
+  </ul>
+</div>
+
+<div class="section-title">Event Driven Architectures</div>
+<div class="question">What in your code triggers events (e.g., GUI, buttons, timeout …)?</div>
+<div class="answer">
+  Implemented with a decoupled Pub/Sub EventBus (<code>CustomEventBus</code>) and Server-Sent Events:
+  <ul>
+    <li><strong>GUI/Buttons:</strong> Numpad clicks emit <code>puzzle:guess</code>; SpongeBob clicks trigger giggle animations; mode cards trigger match transitions.</li>
+    <li><strong>Keyboard:</strong> Physical keys <code>0</code>–<code>9</code> trigger digit answers; <code>Spacebar</code> skips countdown intros.</li>
+    <li><strong>Timers:</strong> 15-second per-puzzle countdowns in Speed Rush trigger timeout losses; match countdown timers end duels.</li>
+    <li><strong>Game State:</strong> Correct guesses fire <code>puzzle:solved</code> (synthesizing audio chimes and floating score badges); wrong guesses fire shake and buzzer events.</li>
+    <li><strong>Network SSE:</strong> Server streams live opponent score and forfeit events to connected duelists.</li>
+  </ul>
+</div>
+
+<div class="section-title">Interoperability</div>
+<div class="question">Do you use the API https://marcconrad.com/uob/tomato/api.php? If no, where in your code do you demonstrate interoperability? What protocols do you use?</div>
+<div class="answer">
+  No, we use <strong>Marc Conrad’s Banana API</strong> (<code>https://marcconrad.com/uob/banana/api.php?out=json</code>).
+  <br>
+  <strong>Demonstrations & Protocols:</strong>
+  <ul>
+    <li><strong>RESTful HTTPS/JSON:</strong> Node.js backend consumes the external puzzle API with a 3.5s timeout circuit breaker in <code>server/src/routes.js</code>.</li>
+    <li><strong>Self-Healing Fallback:</strong> If the external API fails or lags, a local generator outputs mathematical SVG puzzles inline (<code>data:image/svg+xml</code>) without crashing.</li>
+    <li><strong>Server-Sent Events (SSE):</strong> <code>text/event-stream</code> protocol synchronizes real-time 1v1 duels between server and browser.</li>
+    <li><strong>Google OAuth 2.0 / OpenID Connect:</strong> Validates external Google ID tokens via <code>google-auth-library</code>.</li>
+  </ul>
+</div>
+
+<div class="section-title">Virtual Identity</div>
+<div class="question">How did you implement virtual identity in your code? (e.g., Passwords, Cookies, IP Numbers …)</div>
+<div class="answer">
+  <ul>
+    <li><strong>Stateless JWT in HttpOnly Cookies:</strong> Signed tokens stored in secure, HttpOnly, SameSite cookies to block XSS theft.</li>
+    <li><strong>Password Hashing:</strong> Passwords hashed with <code>bcryptjs</code> (10 salt rounds) before SQLite storage.</li>
+    <li><strong>Instant Guest Identity:</strong> <code>POST /api/auth/guest</code> uses <code>node:crypto</code> to generate random nicknames and guest emails for instant play.</li>
+    <li><strong>Google Sign-In:</strong> OpenID Connect token verification linked to local database accounts.</li>
+    <li><strong>RBAC & Rate Limiting:</strong> Role-based access control (Player vs. Admin) and IP-based rate limiting (60 requests/15 min).</li>
+  </ul>
+</div>
+
+<div class="section-title">Any other interesting features:</div>
+<div class="answer">
+  <ul>
+    <li><strong>Web Audio API Synthesizer:</strong> Zero external audio files; generates real-time polyphonic waveforms (bubble pops, chimes, buzzers).</li>
+    <li><strong>HMAC-SHA256 Cryptographic Sealing:</strong> Puzzle answers are signed on the server and verified with timing-safe checks so clients cannot cheat.</li>
+    <li><strong>Cursor Gaze-Tracking:</strong> SpongeBob's eyes compute trigonometric angles (<code>atan2</code>) to follow the user's cursor live.</li>
+    <li><strong>Zero-Config SQLite:</strong> Built-in <code>node:sqlite</code> with Write-Ahead Logging (WAL) and automatic migrations.</li>
+  </ul>
+</div>
+
+</body>
+</html>
